@@ -1,4 +1,5 @@
 local o = require("code_runner.options")
+local M = {}
 
 -- Load json config and convert to table
 local loadTable = require("code_runner.load_json")
@@ -9,7 +10,8 @@ local function file_not_found()
   print(vim.inspect("File not exist or format invalid, please execute :SRunCode"))
 end
 if not fileCommands then
-	return file_not_found
+  M.Run = file_not_found
+  return M
 end
 
 -- Create prefix for run commands
@@ -37,14 +39,36 @@ local function sub_var_command(command)
 	for var, var_vim in pairs(vars_json) do
 		command = command:gsub(var, var_vim)
 	end
-	if not command:find("%%") then
-		command = command .. " %"
-	end
 	return command
 end
 
+function M.get_supported_langs()
+  langs = {}
+  if fileCommands ~=nil then
+    for lang, _ in pairs(fileCommands) do
+      table.insert(langs,lang)
+    end
+  end
+  return langs
+end
+
+function M.term_cmd_runner(lang_to_use)
+  -- check if cmd exists
+  if fileCommands[lang_to_use] == nil then
+    vim.api.nvim_echo({{"No such "..lang_to_use.."language as found"
+      ,"WarningMsg"}},true,{})
+    return
+  end
+
+  -- we reach here means it exists so go ahead and run it
+  local command = prefix..sub_var_command(
+    fileCommands[lang_to_use])
+  -- execute the command gotten
+  vim.api.nvim_exec(command,true)
+end
+
 -- Create shellcmd
-function Run()
+function M.Run()
 	for lang, command in pairs(fileCommands) do
 		local command_vim = sub_var_command(command)
 		shellcmd(lang, command_vim)
@@ -54,4 +78,4 @@ function Run()
 	vimcmd("lua", "luafile %")
 end
 
-return Run
+return M
