@@ -43,10 +43,10 @@ local function sub_var_command(command)
 end
 
 function M.get_supported_langs()
-  langs = {}
+  langs = ""
   if fileCommands ~=nil then
     for lang, _ in pairs(fileCommands) do
-      table.insert(langs,lang)
+      langs = langs..lang.."\n"
     end
   end
   return langs

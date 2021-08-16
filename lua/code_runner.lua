@@ -11,7 +11,7 @@ M.setup = function(user_options)
     return luaeval('require("code_runner.commands").get_supported_langs()')
   endfunction
 
-  command! -nargs=1 -complete=customlist,CodeRunner_Get_Langs  SRunCmd :lua require("code_runner.commands").term_cmd_runner("<args>")
+  command! -nargs=1 -complete=custom,CodeRunner_Get_Langs  SRunCmd :lua require("code_runner.commands").term_cmd_runner("<args>")
   ]],true)
   M.run_code()
 end
